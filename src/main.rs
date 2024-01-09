@@ -2,7 +2,7 @@ use std::io::{self, stdin, stdout, Read, Write};
 use rand::Rng;
 use std::fs::OpenOptions;
 
-fn start() {
+fn main() {
     println!("Select whether you want to create or view passwords");
     println!("1: create new password, 2 = view password");
     let mut ans = String::new();
@@ -17,6 +17,7 @@ fn start() {
         2 => viewer(),
         _ => println!("Invalid option"),
     }
+    pause();
 }
 
 fn pw() -> io::Result<()> {
@@ -49,6 +50,7 @@ fn pw() -> io::Result<()> {
 fn viewer() {
     let data = std::fs::read_to_string("./password.txt").expect("Error reading password file");
     println!("{}", data);
+    pause();
 }
 
 fn pause() {
@@ -56,9 +58,4 @@ fn pause() {
     stdout.write(b"Press Enter to continue...").unwrap();
     stdout.flush().unwrap();
     stdin().read(&mut [0]).unwrap();
-}
-
-fn main() {
-    start();
-    pause();
 }
