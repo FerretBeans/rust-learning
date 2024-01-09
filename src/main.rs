@@ -4,7 +4,8 @@ use std::fs::OpenOptions;
 
 fn main() {
     println!("Select whether you want to create or view passwords");
-    println!("1: create new password, 2 = view password");
+    println!("1: create new password, 2 = view password, 3 = exit the program");
+
     let mut ans = String::new();
     io::stdin()
         .read_line(&mut ans)
@@ -13,17 +14,32 @@ fn main() {
     let ans: u32 = ans.trim().parse().expect("please choose an option");
 
     match ans {
-        1 => pw().expect("Error generating password"),
-        2 => viewer(),
-        _ => println!("Invalid option"),
+        1 => {
+            pw().expect("Error generating password");
+            main();
+        },
+        2 => {
+            viewer();
+            main();
+        },
+        3 => close(),
+        _ => {
+            println!("Invalid option");
+            main();
+        },
     }
-    pause();
 }
 
 fn pw() -> io::Result<()> {
     let char_arr = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$*!@#";
+
+    let mut email = String::new();
+    println!("Enter Email address");
+    io::stdout().flush()?;
+    io::stdin().read_line(&mut email)?;
+
     let mut num = String::new();
-    print!("Enter the amount: ");
+    println!("Enter the amount: ");
     io::stdout().flush()?;
     io::stdin().read_line(&mut num)?;
 
@@ -37,12 +53,13 @@ fn pw() -> io::Result<()> {
     }
     println!("{}", password);
 
+    let emailtxt = email.clone();
     let passwordtxt = password.clone();
     let mut writer = OpenOptions::new()
         .create(true)
         .append(true)
         .open("password.txt")?;
-    writeln!(writer, "{}", passwordtxt)?;
+    writeln!(writer, "{}{}{}", emailtxt, passwordtxt, "\n")?;
 
     Ok(())
 }
@@ -50,12 +67,8 @@ fn pw() -> io::Result<()> {
 fn viewer() {
     let data = std::fs::read_to_string("./password.txt").expect("Error reading password file");
     println!("{}", data);
-    pause();
 }
 
-fn pause() {
-    let mut stdout = stdout();
-    stdout.write(b"Press Enter to continue...").unwrap();
-    stdout.flush().unwrap();
-    stdin().read(&mut [0]).unwrap();
+fn close() {
+    std::process::exit(0);
 }
